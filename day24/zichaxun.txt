@@ -1,0 +1,19 @@
+1.查询所有课程成绩都小于等于60分的同学的学号、姓名
+select sid,sname from student where sid in
+(select sid from sc group by sid having max(score)<60);
+2.查询没有学全所有课的同学的学号、姓名
+select sid,sname from student where sid in
+(select sid from sc group by sid having count(*)<7);
+3.查询每门课程选修人数，格式为课程名称，人数
+select a.cid,cname,count(*) from sc a inner join course b on a.cid=b.cid group by a.cid, cname;
+4.查询全部学生都选修的课程的课程号和课程名
+select * from (select sid from sc group by sid having count(*)=(select count(*) from course))a inner join student b on a.sid=b.sid;
+5.查询两门以上不及格课程的同学的学号及其平均成绩
+select sid,avg(score) from sc group by sid having count(score<60)>2;
+6.查询2号课程成绩比1号课程成绩低的学生的学号、姓名
+select * from (select a.sid from (select sid,cid,score from sc where cid=1)a inner join (select sid,cid,score from sc where cid=2)b on a.sid=b.sid and a.score>b.score)c inner join student d where c.sid=d.sid;
+7.查询学过1号课程并且也学过编号2号课程的同学的学号、姓名
+select * from (select a.sid from (select sid,cid,score from sc where cid=1)a inner join (select sid,cid,score from sc where cid=2)b on a.sid=b.sid)c inner join student d where c.sid=d.sid;
+8.查询没学过“叶平”老师课的同学的学号、姓名
+select * from student where sid not in (select sid from 
+teacher a inner join course b on a.tid=b.tid inner join sc c on b.cid=c.cid where a.tname='叶平');
